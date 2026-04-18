@@ -44,7 +44,7 @@ module Api
         order.total_cents = total_cents
 
         if order.save
-          Pos::SquareAdapter.new.push_order(order)
+          ::Pos::SquareAdapter.new.push_order(order)
           OrderMailer.confirmation(order).deliver_later
           render json: order_response(order), status: :created
         else

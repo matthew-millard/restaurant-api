@@ -1,0 +1,21 @@
+Order Confirmed!
+
+Hi <%= @order.customer_name %>,
+
+Your order #<%= @order.id[0..7] %> has been placed.
+
+Order Summary
+<%= "-" * 40 %>
+<% @order_items.each do |oi| %>
+<%= oi.menu_item&.name %> x<%= oi.quantity %> - $<%= "%.2f" % ((oi.unit_price_cents || 0) * (oi.quantity || 0) / 100.0) %>
+<% if oi.modifications.present? %>  Note: <%= oi.modifications %>
+<% end %>
+<% end %>
+<%= "-" * 40 %>
+Total: $<%= "%.2f" % ((@order.total_cents || 0) / 100.0) %>
+
+Pickup time: <%= @order.pickup_time %>
+
+If you need to cancel, please do so before your order is prepared.
+
+Thank you!

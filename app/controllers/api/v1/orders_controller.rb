@@ -45,6 +45,7 @@ module Api
 
         if order.save
           Pos::SquareAdapter.new.push_order(order)
+          OrderMailer.confirmation(order).deliver_later
           render json: order_response(order), status: :created
         else
           render json: { errors: order.errors.full_messages }, status: :unprocessable_entity

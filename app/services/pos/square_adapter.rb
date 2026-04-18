@@ -60,7 +60,43 @@ module Pos
 
     #: (Order order) -> void
     def push_order(order)
-      raise NotImplementedError, "#{self.class}#push_order is not implemented"
+      body = {
+        idempotency_key: order.id,
+        order: {
+          location_id: Rails.application.credentials.square[:location_id],
+          line_items: order.order_items.includes(:menu_item).map { |oi|
+            {
+              catalog_object_id: oi.menu_item&.square_variation_id,
+              quantity: oi.quantity.to_s,
+              note: oi.modifications
+            }.compact
+          },
+          fulfillments: [
+            {
+              type: "PICKUP",
+              state: "PROPOSED",
+              pickup_details: {
+                recipient: {
+                  display_name: order.customer_name,
+                  email_address: order.customer_email
+                },
+                pickup_at: order.pickup_time,
+                note: "Ordered via AI assistant"
+              }
+            }
+          ]
+        }
+      }
+
+      response = @connection.post("/v2/orders") do |req|
+        req.headers["Authorization"] = "Bearer #{@access_token}"
+        req.body = body
+      end
+
+      square_order_id = response.body.dig("order", "id")
+      order.update!(square_order_id: square_order_id) if square_order_id
+    rescue Faraday::Error => e
+      Rails.logger.error("Square push_order failed for Order##{order.id}: #{e.message}")
     end
 
     #: (String external_order_id) -> String

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_12_155429) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_18_035318) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_12_155429) do
     t.boolean "available", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "square_catalog_id"
+    t.string "square_variation_id"
+    t.datetime "last_synced_at"
+    t.index ["square_catalog_id"], name: "index_menu_items_on_square_catalog_id", unique: true
+    t.index ["square_variation_id"], name: "index_menu_items_on_square_variation_id", unique: true
   end
 
   create_table "order_items", force: :cascade do |t|
@@ -44,6 +49,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_12_155429) do
     t.integer "total_cents"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "square_order_id"
+    t.index ["square_order_id"], name: "index_orders_on_square_order_id", unique: true
   end
 
   add_foreign_key "order_items", "menu_items"

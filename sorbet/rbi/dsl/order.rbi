@@ -815,6 +815,9 @@ class Order
     def restore_pickup_time!; end
 
     sig { void }
+    def restore_square_order_id!; end
+
+    sig { void }
     def restore_status!; end
 
     sig { void }
@@ -860,6 +863,12 @@ class Order
     def saved_change_to_pickup_time?(from: T.unsafe(nil), to: T.unsafe(nil)); end
 
     sig { returns(T.nilable([T.nilable(::String), T.nilable(::String)])) }
+    def saved_change_to_square_order_id; end
+
+    sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
+    def saved_change_to_square_order_id?(from: T.unsafe(nil), to: T.unsafe(nil)); end
+
+    sig { returns(T.nilable([T.nilable(::String), T.nilable(::String)])) }
     def saved_change_to_status; end
 
     sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
@@ -876,6 +885,51 @@ class Order
 
     sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
     def saved_change_to_updated_at?(from: T.unsafe(nil), to: T.unsafe(nil)); end
+
+    sig { returns(T.nilable(::String)) }
+    def square_order_id; end
+
+    sig { params(value: T.nilable(::String)).returns(T.nilable(::String)) }
+    def square_order_id=(value); end
+
+    sig { returns(T::Boolean) }
+    def square_order_id?; end
+
+    sig { returns(T.nilable(::String)) }
+    def square_order_id_before_last_save; end
+
+    sig { returns(T.untyped) }
+    def square_order_id_before_type_cast; end
+
+    sig { returns(T::Boolean) }
+    def square_order_id_came_from_user?; end
+
+    sig { returns(T.nilable([T.nilable(::String), T.nilable(::String)])) }
+    def square_order_id_change; end
+
+    sig { returns(T.nilable([T.nilable(::String), T.nilable(::String)])) }
+    def square_order_id_change_to_be_saved; end
+
+    sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
+    def square_order_id_changed?(from: T.unsafe(nil), to: T.unsafe(nil)); end
+
+    sig { returns(T.nilable(::String)) }
+    def square_order_id_in_database; end
+
+    sig { returns(T.nilable([T.nilable(::String), T.nilable(::String)])) }
+    def square_order_id_previous_change; end
+
+    sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
+    def square_order_id_previously_changed?(from: T.unsafe(nil), to: T.unsafe(nil)); end
+
+    sig { returns(T.nilable(::String)) }
+    def square_order_id_previously_was; end
+
+    sig { returns(T.nilable(::String)) }
+    def square_order_id_was; end
+
+    sig { void }
+    def square_order_id_will_change!; end
 
     sig { returns(T.nilable(::String)) }
     def status; end
@@ -1029,6 +1083,9 @@ class Order
 
     sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
     def will_save_change_to_pickup_time?(from: T.unsafe(nil), to: T.unsafe(nil)); end
+
+    sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
+    def will_save_change_to_square_order_id?(from: T.unsafe(nil), to: T.unsafe(nil)); end
 
     sig { params(from: T.untyped, to: T.untyped).returns(T::Boolean) }
     def will_save_change_to_status?(from: T.unsafe(nil), to: T.unsafe(nil)); end

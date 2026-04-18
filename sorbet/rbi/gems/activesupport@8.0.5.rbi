@@ -18063,6 +18063,43 @@ class Integer < ::Numeric
   # pkg:gem/activesupport#lib/active_support/core_ext/integer/time.rb:10
   def months; end
 
+  # Check whether the integer is evenly divisible by the argument.
+  #
+  #   0.multiple_of?(0)  # => true
+  #   6.multiple_of?(5)  # => false
+  #   10.multiple_of?(2) # => true
+  #
+  # @return [Boolean]
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/integer/multiple.rb:9
+  def multiple_of?(number); end
+
+  # Ordinal returns the suffix used to denote the position
+  # in an ordered sequence such as 1st, 2nd, 3rd, 4th.
+  #
+  #   1.ordinal     # => "st"
+  #   2.ordinal     # => "nd"
+  #   1002.ordinal  # => "nd"
+  #   1003.ordinal  # => "rd"
+  #   -11.ordinal   # => "th"
+  #   -1001.ordinal # => "st"
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/integer/inflections.rb:28
+  def ordinal; end
+
+  # Ordinalize turns a number into an ordinal string used to denote the
+  # position in an ordered sequence such as 1st, 2nd, 3rd, 4th.
+  #
+  #   1.ordinalize     # => "1st"
+  #   2.ordinalize     # => "2nd"
+  #   1002.ordinalize  # => "1002nd"
+  #   1003.ordinalize  # => "1003rd"
+  #   -11.ordinalize   # => "-11th"
+  #   -1001.ordinalize # => "-1001st"
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/integer/inflections.rb:15
+  def ordinalize; end
+
   # Returns a Duration instance matching the number of years provided.
   #
   #   2.years # => 2 years
@@ -18080,7 +18117,19 @@ end
 
 # pkg:gem/activesupport#lib/active_support/core_ext/kernel/reporting.rb:3
 module Kernel
+  # class_eval on an object acts like +singleton_class.class_eval+.
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/kernel/singleton_class.rb:5
+  def class_eval(*args, &block); end
+
   private
+
+  # A shortcut to define a toplevel concern, not within a module.
+  #
+  # See Module::Concerning for more.
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/kernel/concern.rb:11
+  def concern(topic, &module_definition); end
 
   # Sets $VERBOSE to +true+ for the duration of the block and back to its
   # original value afterwards.
@@ -18119,6 +18168,13 @@ module Kernel
   def with_warnings(flag); end
 
   class << self
+    # A shortcut to define a toplevel concern, not within a module.
+    #
+    # See Module::Concerning for more.
+    #
+    # pkg:gem/activesupport#lib/active_support/core_ext/kernel/concern.rb:11
+    def concern(topic, &module_definition); end
+
     # Sets $VERBOSE to +true+ for the duration of the block and back to its
     # original value afterwards.
     #
@@ -18155,6 +18211,19 @@ module Kernel
     # pkg:gem/activesupport#lib/active_support/core_ext/kernel/reporting.rb:26
     def with_warnings(flag); end
   end
+end
+
+# pkg:gem/activesupport#lib/active_support/core_ext/load_error.rb:3
+class LoadError < ::ScriptError
+  include ::DidYouMean::Correctable
+
+  # Returns true if the given path name (except perhaps for the ".rb"
+  # extension) is the missing file which caused the exception to be raised.
+  #
+  # @return [Boolean]
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/load_error.rb:6
+  def is_missing?(location); end
 end
 
 # == Attribute Accessors per Thread
@@ -19915,6 +19984,40 @@ end
 class Pathname
   # pkg:gem/activesupport#lib/active_support/core_ext/object/json.rb:237
   def as_json(options = T.unsafe(nil)); end
+
+  # An Pathname is blank if it's empty:
+  #
+  #   Pathname.new("").blank?      # => true
+  #   Pathname.new(" ").blank?     # => false
+  #   Pathname.new("test").blank?  # => false
+  #
+  # @return [true, false]
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/pathname/blank.rb:13
+  def blank?; end
+
+  # Returns the receiver if the named file exists otherwise returns +nil+.
+  # <tt>pathname.existence</tt> is equivalent to
+  #
+  #    pathname.exist? ? pathname : nil
+  #
+  # For example, something like
+  #
+  #   content = pathname.read if pathname.exist?
+  #
+  # becomes
+  #
+  #   content = pathname.existence&.read
+  #
+  # @return [Pathname]
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/pathname/existence.rb:20
+  def existence; end
+
+  # @return [Boolean]
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/pathname/blank.rb:17
+  def present?; end
 end
 
 module Process
@@ -20199,6 +20302,21 @@ class String
   # pkg:gem/activesupport#lib/active_support/core_ext/string/inflections.rb:284
   def downcase_first; end
 
+  # pkg:gem/activesupport#lib/active_support/core_ext/string/starts_ends_with.rb:5
+  def ends_with?(*_arg0); end
+
+  # The inverse of <tt>String#include?</tt>. Returns true if the string
+  # does not include the other string.
+  #
+  #   "hello".exclude? "lo" # => false
+  #   "hello".exclude? "ol" # => true
+  #   "hello".exclude? ?h   # => false
+  #
+  # @return [Boolean]
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/string/exclude.rb:10
+  def exclude?(string); end
+
   # Returns the first character. If a limit is supplied, returns a substring
   # from the beginning of the string until it reaches the limit value. If the
   # given limit is greater than or equal to the string length, returns a copy of self.
@@ -20280,6 +20398,45 @@ class String
   #
   # pkg:gem/activesupport#lib/active_support/core_ext/string/zones.rb:9
   def in_time_zone(zone = T.unsafe(nil)); end
+
+  # Indents the lines in the receiver:
+  #
+  #   <<EOS.indent(2)
+  #   def some_method
+  #     some_code
+  #   end
+  #   EOS
+  #   # =>
+  #     def some_method
+  #       some_code
+  #     end
+  #
+  # The second argument, +indent_string+, specifies which indent string to
+  # use. The default is +nil+, which tells the method to make a guess by
+  # peeking at the first indented line, and fall back to a space if there is
+  # none.
+  #
+  #   "  foo".indent(2)        # => "    foo"
+  #   "foo\n\t\tbar".indent(2) # => "\t\tfoo\n\t\t\t\tbar"
+  #   "foo".indent(2, "\t")    # => "\t\tfoo"
+  #
+  # While +indent_string+ is typically one space or tab, it may be any string.
+  #
+  # The third argument, +indent_empty_lines+, is a flag that says whether
+  # empty lines should be indented. Default is false.
+  #
+  #   "foo\n\nbar".indent(2)            # => "  foo\n\n  bar"
+  #   "foo\n\nbar".indent(2, nil, true) # => "  foo\n  \n  bar"
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/string/indent.rb:42
+  def indent(amount, indent_string = T.unsafe(nil), indent_empty_lines = T.unsafe(nil)); end
+
+  # Same as +indent+, except it indents the receiver in-place.
+  #
+  # Returns the indented string, or +nil+ if there was nothing to indent.
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/string/indent.rb:7
+  def indent!(amount, indent_string = T.unsafe(nil), indent_empty_lines = T.unsafe(nil)); end
 
   # Wraps the current string in the ActiveSupport::StringInquirer class,
   # which gives you a prettier way to test for equality.
@@ -20493,6 +20650,31 @@ class String
   #
   # pkg:gem/activesupport#lib/active_support/core_ext/string/filters.rb:21
   def squish!; end
+
+  # pkg:gem/activesupport#lib/active_support/core_ext/string/starts_ends_with.rb:4
+  def starts_with?(*_arg0); end
+
+  # Strips indentation in heredocs.
+  #
+  # For example in
+  #
+  #   if options[:usage]
+  #     puts <<-USAGE.strip_heredoc
+  #       This command does such and such.
+  #
+  #       Supported options are:
+  #         -h         This message
+  #         ...
+  #     USAGE
+  #   end
+  #
+  # the user would see the usage message aligned against the left margin.
+  #
+  # Technically, it looks for the least indented non-empty line
+  # in the whole string, and removes that amount of leading whitespace.
+  #
+  # pkg:gem/activesupport#lib/active_support/core_ext/string/strip.rb:22
+  def strip_heredoc; end
 
   # Creates the name of a table like \Rails does for models to table names. This method
   # uses the +pluralize+ method on the last word in the string.
@@ -20713,10 +20895,16 @@ class Symbol
   # pkg:gem/activesupport#lib/active_support/core_ext/object/blank.rb:128
   def blank?; end
 
+  # pkg:gem/activesupport#lib/active_support/core_ext/symbol/starts_ends_with.rb:5
+  def ends_with?(*_arg0); end
+
   # @return [Boolean]
   #
   # pkg:gem/activesupport#lib/active_support/core_ext/object/blank.rb:130
   def present?; end
+
+  # pkg:gem/activesupport#lib/active_support/core_ext/symbol/starts_ends_with.rb:4
+  def starts_with?(*_arg0); end
 end
 
 class Thread

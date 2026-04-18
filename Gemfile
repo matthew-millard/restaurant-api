@@ -44,4 +44,8 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem "sorbet-static-and-runtime", require: false
+  gem "tapioca", require: false
+  gem "rubocop-sorbet", require: false
 end

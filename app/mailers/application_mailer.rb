@@ -1,4 +1,7 @@
+# typed: true
+# frozen_string_literal: true
+
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
+  default from: "orders@restaurant-api.local"
   layout "mailer"
 end

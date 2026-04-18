@@ -1,11 +1,16 @@
+# typed: true
+# frozen_string_literal: true
+
 module Api
   module V1
     class OrdersController < ApplicationController
+      #: -> void
       def show
         order = Order.find(params[:id])
         render json: order_response(order)
       end
 
+      #: -> void
       def create
         order = Order.new(
           customer_name: order_params[:customer_name],
@@ -15,9 +20,15 @@ module Api
 
         total_cents = 0
 
-        order_params[:items].each do |item_data|
+        items = order_params[:items]
+        return render json: { errors: [ "Items are required" ] }, status: :unprocessable_entity if items.nil?
+
+        items.each do |item_data|
           menu_item = MenuItem.find(item_data[:menu_item_id])
-          unit_price_cents = (menu_item.price * 100).to_i
+          price = menu_item.price
+          next unless price
+
+          unit_price_cents = (price * 100).to_i
           quantity = item_data[:quantity].to_i
 
           order.order_items.build(
@@ -39,6 +50,7 @@ module Api
         end
       end
 
+      #: -> void
       def cancel
         order = Order.find(params[:id])
 
@@ -52,10 +64,12 @@ module Api
 
       private
 
+      #: -> ActionController::Parameters
       def order_params
         params.require(:order).permit(:customer_name, :customer_email, :pickup_time, items: [ :menu_item_id, :quantity, :modifications ])
       end
 
+      #: (Order) -> Hash[Symbol, untyped]
       def order_response(order)
         {
           id: order.id,
@@ -64,18 +78,26 @@ module Api
           customer_email: order.customer_email,
           pickup_time: order.pickup_time,
           total: format_dollars(order.total_cents),
-          items: order.order_items.includes(:menu_item).map { |oi|
+          items: order.order_items.includes(:menu_item).filter_map { |oi|
+            mi = oi.menu_item
+            next unless mi
+
+            unit_price = oi.unit_price_cents || 0
+            qty = oi.quantity || 0
+
             {
-              name: oi.menu_item.name,
-              quantity: oi.quantity,
+              name: mi.name,
+              quantity: qty,
               modifications: oi.modifications,
-              price: format_dollars(oi.unit_price_cents * oi.quantity)
+              price: format_dollars(unit_price * qty)
             }
           }
         }
       end
 
+      #: (Integer?) -> String
       def format_dollars(cents)
+        cents = cents || 0
         "$#{'%.2f' % (cents / 100.0)}"
       end
     end

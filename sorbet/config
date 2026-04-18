@@ -1,0 +1,4 @@
+--dir
+.
+--enable-experimental-rbs-comments
+--suppress-payload-superclass-redefinition-for=RDoc::Markup::Heading

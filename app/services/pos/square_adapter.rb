@@ -80,7 +80,7 @@ module Pos
                   display_name: order.customer_name,
                   email_address: order.customer_email
                 },
-                pickup_at: order.pickup_time,
+                pickup_at: parse_pickup_time(order.pickup_time),
                 note: "Ordered via AI assistant"
               }
             }
@@ -96,7 +96,8 @@ module Pos
       square_order_id = response.body.dig("order", "id")
       order.update!(square_order_id: square_order_id) if square_order_id
     rescue Faraday::Error => e
-      Rails.logger.error("Square push_order failed for Order##{order.id}: #{e.message}")
+      body = e.response&.dig(:body) if e.respond_to?(:response)
+      Rails.logger.error("Square push_order failed for Order##{order.id}: #{e.message} — #{body}")
     end
 
     #: (String external_order_id) -> String
@@ -136,6 +137,15 @@ module Pos
       end
 
       items
+    end
+
+    #: (String?) -> String
+    def parse_pickup_time(time_string)
+      parsed = Time.zone.parse(time_string.to_s)
+      parsed = parsed.change(day: Time.current.day, month: Time.current.month, year: Time.current.year) if parsed
+      # If the time is in the past, assume tomorrow
+      parsed = parsed + 1.day if parsed && parsed < Time.current
+      (parsed || 1.hour.from_now).iso8601
     end
 
     #: (String types, ?String? cursor) -> Hash[String, untyped]
